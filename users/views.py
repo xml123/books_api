@@ -7,7 +7,6 @@ from .models import Users,BookCapter,UserReadStatus
 from django.core import serializers
 import requests
 from books.models import Author, Category, Book, chapter
-
 #解析微信返回的数据
 def process_response_login(rsp):
 	"""解析微信登录返回的json数据，返回相对应的dict, 错误信息"""
