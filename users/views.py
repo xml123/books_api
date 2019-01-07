@@ -7,15 +7,29 @@ from .models import Users,BookCapter,UserReadStatus
 from django.core import serializers
 import requests
 from books.models import Author, Category, Book, chapter
+import urllib.request
+import urllib.parse
 
 #解析微信返回的数据
+# def process_response_login(rsp):
+# 	print('rsp',rsp.read().decode('utf-8'))
+# 	"""解析微信登录返回的json数据，返回相对应的dict, 错误信息"""
+# 	if 200 != rsp.status_code:
+# 		return None, {'code': rsp.status_code, 'msg': 'http error'}
+# 	try:
+# 		content = rsp.json()
+# 	except Exception as e:
+# 		return None, {'code': 9999, 'msg': e}
+# 	if 'errcode' in content and content['errcode'] != 0:
+# 		return None, {'code': content['errcode'], 'msg': content['errmsg']}
+# 	return content, None
+
 def process_response_login(rsp):
-	"""解析微信登录返回的json数据，返回相对应的dict, 错误信息"""
-	if 200 != rsp.status_code:
-		return None, {'code': rsp.status_code, 'msg': 'http error'}
 	try:
-		content = rsp.json()
+		content2 = rsp.read().decode('utf-8')
+		content = json.loads(content2)
 	except Exception as e:
+		print('出错了')
 		return None, {'code': 9999, 'msg': e}
 	if 'errcode' in content and content['errcode'] != 0:
 		return None, {'code': content['errcode'], 'msg': content['errmsg']}
@@ -27,9 +41,11 @@ def getWxAppid(code):
             'appid': 'wxff782f9a8a041250',
             'js_code': code,
             'secret': '73515868baa360f1dbe6caa0d50b0e6b',
-            'grant_type':'authorization_code'}
-	token, err = process_response_login(requests.get('https://api.weixin.qq.com/sns/jscode2session', params=params))
-	#print('token',token)
+            'grant_type':'authorization_code'
+            }
+	url = 'https://api.weixin.qq.com/sns/jscode2session?appid=wxff782f9a8a041250&js_code='+code+'&secret=73515868baa360f1dbe6caa0d50b0e6b&grant_type=authorization_code'
+    #token, err = process_response_login(requests.get('https://api.weixin.qq.com/sns/jscode2session', params=params))
+	token, err = process_response_login(urllib.request.urlopen(url))
 	if not err:
 		_session_key = token['session_key']
 		_openid = token['openid']
