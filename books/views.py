@@ -200,6 +200,45 @@ def getAbstract(request):
 	else:
 		return HttpResponse('It is not a POST request!!!')
 
+#首页banner推荐
+#@methord GET
+def getBannerOne(request):
+	#第一张banner数据
+	try:
+		book = Book.objects.filter(id = 10)
+		bannerOne = {
+			"id":book[0].id,
+			"title":book[0].title,
+			"bookImg":book[0].book_img,
+			"author":book[0].author.name,
+		}
+	except:
+		print('获取书籍出错')
+		return
+	#第二张banne数据
+	try:
+		books = Book.objects.all()[5:11]
+	except:
+		print('获取书籍出错')
+		return
+	bannerTwo = []
+	for item in books:
+		bannerTwo.append({
+			'id':item.id,
+			'title':item.title,
+			'author':item.author.name,		#关联表查询
+			'bookImg':item.book_img,
+			})
+
+	data = {
+		"code":200,
+		"msg":'成功',
+		"data":{
+			"bannerOne":bannerOne,
+			"bannerTwo":bannerTwo
+		}
+	}
+	return HttpResponse(json.dumps(data,ensure_ascii=False), content_type="application/json", charset='utf-8', status='200',reason='success')
 
 
 

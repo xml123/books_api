@@ -27,7 +27,6 @@ def process_response_login(rsp):
 	try:
 		#content2 = rsp.read().decode('utf-8')
 		content = rsp.json()
-		#content = json.loads(content2)
 	except Exception as e:
 		print('出错了')
 		return None, {'code': 9999, 'msg': e}
@@ -44,9 +43,9 @@ def getWxAppid(code):
             'secret': '73515868baa360f1dbe6caa0d50b0e6b',
             'grant_type':'authorization_code'
             }
-	url = 'https://api.weixin.qq.com/sns/jscode2session?appid=wxff782f9a8a041250&js_code='+code+'&secret=73515868baa360f1dbe6caa0d50b0e6b&grant_type=authorization_code'
+	url = 'https://api.weixin.qq.com/sns/jscode2session?appid=wxff782f9a8a041250&js_code=%s&secret=73515868baa360f1dbe6caa0d50b0e6b&grant_type=authorization_code' % code
     #token, err = process_response_login(requests.get('https://api.weixin.qq.com/sns/jscode2session', params=params))
-	#token, err = process_response_login(urllib.request.urlopen(url),cafile=certifi.where())
+	# token, err = process_response_login(urllib.request.urlopen(url))
 	token, err = process_response_login(s.get(url))
 	if not err:
 		_session_key = token['session_key']

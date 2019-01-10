@@ -28,7 +28,12 @@ class Book(models.Model):
 	book_img = models.CharField(max_length = 100,blank=True)
 
 	# #创建时间
-	# created_time = models.DateTimeField(blank=True)
+	#created_time = models.DateTimeField(blank=True)
+	# #小说的赞
+	# books_love = models.IntegerField(default=0)
+
+	#小说收藏数
+	# books_collect = models.CharField(max_length = 5000,blank=True)
 
 	#小说简介
 	book_abstract = models.CharField(max_length=500,blank=True)
