@@ -9,4 +9,5 @@ urlpatterns = [
 	path('api/get_chapter', views.getChapter, name='getChapter'),		#小说章节
 	path('api/get_chapter_detail', views.getChapterDetail, name='getChapterDetail'),	#小说章节详情
 	path('api/get_abstract', views.getAbstract, name='getAbstract'),	#小说简介
+	path('api/get_banner_one', views.getBannerOne, name='getBannerOne'),	#首页banner推荐
 ]
