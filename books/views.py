@@ -178,8 +178,9 @@ def getAbstract(request):
 		books = user_obj.book.filter(id=book_id)
 		userid = Users.objects.filter(openid=openid)
 		chapter_obj = BookCapter.objects.filter(bookid=book_id,users_id=userid[0].id)
-		if len(chapter_obj):
+		if len(books):
 			user_chapter = chapter_obj[0].capterid
+			print('user_chapter',user_chapter)
 		else:
 			user_chapter = 1
 		data = {
