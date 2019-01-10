@@ -2,3 +2,4 @@
 static/.DS_Store
 static/*
 */migrations/*
+*/__pycache__/*
