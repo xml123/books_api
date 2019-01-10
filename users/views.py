@@ -186,9 +186,8 @@ def saveChapter(request):
 				bookCapter.save()
 			else:
 				print('更新成功')
-				this_book = BookCapter.objects.get(bookid=bookid)
-				this_book.capterid = capterid
-				this_book.save()
+				is_bookid.capterid = capterid
+				is_bookid.save()
 		except Exception as e:
 			print(e)
 			return HttpResponse('获取前端传回的数据失败')
