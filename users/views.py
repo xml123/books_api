@@ -179,7 +179,7 @@ def saveChapter(request):
 			capterid = data_string['capterid']
 
 			userid = Users.objects.filter(openid=openid)
-			is_bookid = BookCapter.objects.filter(bookid=bookid)
+			is_bookid = BookCapter.objects.filter(bookid=bookid,users_id=userid[0].id)
 			if not is_bookid:
 				print('新保存成功')
 				bookCapter = BookCapter(users_id=userid[0].id,bookid=bookid,capterid=capterid)
