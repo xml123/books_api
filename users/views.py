@@ -9,20 +9,8 @@ import requests
 from books.models import Author, Category, Book, chapter
 import urllib.request
 import urllib.parse
-#解析微信返回的数据
-# def process_response_login(rsp):
-# 	print('rsp',rsp.read().decode('utf-8'))
-# 	"""解析微信登录返回的json数据，返回相对应的dict, 错误信息"""
-# 	if 200 != rsp.status_code:
-# 		return None, {'code': rsp.status_code, 'msg': 'http error'}
-# 	try:
-# 		content = rsp.json()
-# 	except Exception as e:
-# 		return None, {'code': 9999, 'msg': e}
-# 	if 'errcode' in content and content['errcode'] != 0:
-# 		return None, {'code': content['errcode'], 'msg': content['errmsg']}
-# 	return content, None
 
+#解析微信返回的数据
 def process_response_login(rsp):
 	try:
 		#content2 = rsp.read().decode('utf-8')

@@ -22,25 +22,31 @@ def getAllBooks(request):
 		except Exception as e:
 			print(e)
 			print('获取前端传回的数据失败')
-		book_list = Book.objects.all().order_by('-id')
+		book_list = Book.objects.all().order_by('id')
 		paginator = Paginator(book_list, pageSize)
 		total = paginator.count
-
-		try:
-			books = paginator.page(pageNum)
-		except PageNotAnInteger:
-			books = paginator.page(1)
-		except EmptyPage:
-			books = paginator.page(paginator.num_pages)
+		all_pages = paginator.num_pages
+		if int(pageNum) > all_pages:
+			books = []
+		else:
+			try:
+				books = paginator.page(pageNum)
+			except PageNotAnInteger:
+				books = paginator.page(1)
+			except EmptyPage:
+				books = paginator.page(paginator.num_pages)
 
 		arrayList = []
 		for item in books:
+			book_id = item.id
+			book_detail = Book.objects.filter(id=book_id)
 			arrayList.append({
 				'id':item.id,
 				'title':item.title,
 				'author':item.author.name,		#关联表查询
 				'category':item.category.name,
 				'bookImg':item.book_img,
+				'abstract':book_detail[0].book_abstract
 				})
 
 		data = {
@@ -56,7 +62,7 @@ def getAllBooks(request):
 #猜你喜欢
 #@methord GET
 def getYouLike(request):
-	num_list = range(1,20)
+	num_list = range(1,10)
 	result = random.sample(num_list, 3)
 	book_list = Book.objects.filter(id__in=result) 
 	arrayList = []
@@ -79,7 +85,7 @@ def getYouLike(request):
 #热门推荐
 #@methord GET
 def getHotRecommend(request):
-	num_list = range(1,20)
+	num_list = range(10,40)
 	result = random.sample(num_list, 6)
 	try:
 		book_list = Book.objects.filter(id__in=result)
