@@ -62,7 +62,7 @@ def getAllBooks(request):
 #猜你喜欢
 #@methord GET
 def getYouLike(request):
-	num_list = range(1,10)
+	num_list = range(1,30)
 	result = random.sample(num_list, 3)
 	book_list = Book.objects.filter(id__in=result) 
 	arrayList = []
@@ -85,7 +85,7 @@ def getYouLike(request):
 #热门推荐
 #@methord GET
 def getHotRecommend(request):
-	num_list = range(10,40)
+	num_list = range(30,100)
 	result = random.sample(num_list, 6)
 	try:
 		book_list = Book.objects.filter(id__in=result)
