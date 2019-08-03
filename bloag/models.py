@@ -22,7 +22,7 @@ class Artical(models.Model):
     view = models.IntegerField(default=0)
     time = models.DateTimeField(auto_now_add=True)
     classify = models.ForeignKey(Classify, on_delete=models.CASCADE)
-    status =models.BooleanField(default=False)
+    status = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
