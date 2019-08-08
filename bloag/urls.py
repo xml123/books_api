@@ -12,5 +12,8 @@ urlpatterns = [
     path('api/get_all_artical', views.getAllArtical, name='getAllArtical'),
     path('api/delete_artical', views.deleatArtical, name='deleatArtical'),
     path('api/get_draft_artical', views.getDraftArtical, name='getDraftArtical'),
-    path('api/get_artical_id', views.getArticalId, name='getArticalId')
+    path('api/get_artical_id', views.getArticalId, name='getArticalId'),
+    path('api/get_artical_message', views.getArticalMessage, name='getArticalMessage'),
+    path('api/add_artical_view', views.addArticalView, name='addArticalView'),
+    path('api/add_artical_message', views.addArticalMessage, name='addArticalMessage')
 ]

@@ -147,6 +147,7 @@ def getArticalTypeList(request):
                 'title': item.title,
                 'content': item.content,
                 'view': item.view,
+                'type':type,
                 'time': local_time.strftime('%Y-%m-%d')
             })
         data = {
@@ -279,5 +280,75 @@ def getArticalId(request):
                             status='200', reason='success')
     else:
         return HttpResponse('It is not a POST request!!!')
+
+#获取文章评论
+#POST
+def getArticalMessage(request):
+    try:
+        data_string = json.loads(request.body)
+        id = data_string['id']
+    except Exception as e:
+        print(e, '获取前端传回的数据失败')
+    message_list = ArticalMessage.objects.filter(artical_id=id, parent_comment_id__isnull=True)
+    list = []
+    for item in message_list:
+        local_time = item.created_time
+        visitor_obj = Visitor.objects.get(id=item.visitor_id)
+        list.append({
+            'id': item.id,
+            'message': item.message,
+            'time': local_time.strftime('%Y-%m-%d'),
+            'visitor': {
+                'name': visitor_obj.name,
+                'id': visitor_obj.id,
+                'avatar': visitor_obj.avatar,
+                'link': visitor_obj.link
+            }
+        })
+    data = {
+        "code": "200",
+        "msg": "成功",
+        "data": list
+    }
+    return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json", charset='utf-8',
+                        status='200', reason='success')
+#增加文章阅读数
+#POST
+def addArticalView(request):
+    try:
+        data_string = json.loads(request.body)
+        id = data_string['id']
+    except Exception as e:
+        print(e, '获取前端传回的数据失败')
+    artical_obj = Artical.objects.get(id=id)
+    artical_obj.view = artical_obj.view + 1
+    artical_obj.save()
+    data = {
+        "code": "200",
+        "msg": "成功",
+    }
+    return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json", charset='utf-8',
+                        status='200', reason='success')
+
+#添加评论
+#POST
+def addArticalMessage(request):
+    try:
+        data_string = json.loads(request.body)
+        artical_id = data_string['artical_id']
+        message = data_string['message']
+        user_id = data_string['user_id']
+        localTime = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+    except Exception as e:
+        print(e, '获取前端传回的数据失败')
+    message_obj = ArticalMessage(message=message, artical_id=artical_id, visitor_id=user_id, time=localTime,
+                                 parent_comment_id=False)
+    message_obj.save()
+    data = {
+        "code": "200",
+        "msg": "成功"
+    }
+    return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json", charset='utf-8',
+                        status='200', reason='success')
 
 
