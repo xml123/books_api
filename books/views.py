@@ -5,7 +5,6 @@ import random
 # Create your views here.
 from django.http import HttpResponse
 from .models import Author, Category, Book, chapter
-from django.core import serializers
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from users.models import Users,BookCapter
 
@@ -149,7 +148,7 @@ def getChapterDetail(request):
 		except Exception as e:
 			print(e)
 			print('获取前端传回的数据失败')
-		chapter_detail = chapter.objects.filter(book_id_id=book_id,chapter_id=chapter_id)
+		chapter_detail = chapter.objects.filter(book_id_id=book_id, chapter_id=chapter_id)
 		print
 		data = {
 			"code":'200',

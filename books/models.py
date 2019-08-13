@@ -19,13 +19,13 @@ class Author(models.Model):
 #小说
 class Book(models.Model):
 	#小说名
-	title = models.CharField(max_length = 100)
+	title = models.CharField(max_length=100)
 
 	#小说链接
-	url = models.CharField(max_length = 100,blank=True)
+	url = models.CharField(max_length=100, blank=True)
 
 	#小说封面图
-	book_img = models.CharField(max_length = 100,blank=True)
+	book_img = models.CharField(max_length=100, blank=True)
 
 	# #创建时间
 	#created_time = models.DateTimeField(blank=True)
