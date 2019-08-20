@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from .models import Classify, Visitor, Artical, ArticalMessage,LiveMessage,Friends
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import time
+import requests
 from datetime import datetime
 
 # Create your views here.
@@ -336,13 +337,13 @@ def addArticalMessage(request):
     try:
         data_string = json.loads(request.body)
         artical_id = data_string['artical_id']
-        message = data_string['message']
-        user_id = data_string['user_id']
+        message = data_string['comment']
+        user_name = data_string['name']
         localTime = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+        user_obj = Visitor.objects.get(name=user_name)
     except Exception as e:
         print(e, '获取前端传回的数据失败')
-    message_obj = ArticalMessage(message=message, artical_id=artical_id, visitor_id=user_id, time=localTime,
-                                 parent_comment_id=False)
+    message_obj = ArticalMessage(message=message, artical_id=artical_id, visitor_id=user_obj.id, created_time=localTime)
     message_obj.save()
     data = {
         "code": "200",
@@ -351,4 +352,43 @@ def addArticalMessage(request):
     return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json", charset='utf-8',
                         status='200', reason='success')
 
+#github登录
+#POST
+def getCode(request):
+    try:
+        data_string = json.loads(request.body)
+        code = data_string['code']
+        post_data = {'code': code, 'client_id': '0fd0f7869375ba937215', 'client_secret': '8fbbd77ad452b730cdd4912dc9646bf33a602abf'}
+        response = requests.post('https://github.com/login/oauth/access_token', data=post_data)
+        content = response.content
+        json_str = content.decode()
+        json_data = json_str.split('=')
+        access_token = json_data[1]
+        json_data2 = access_token.split('&')
+        access_token2 = json_data2[0]
 
+        #获取用户基本信息
+        response2 = requests.get('https://api.github.com/user', {'access_token': access_token2})
+        content2 = response2.content
+        res_str = content2.decode()
+        req_data = json.loads(res_str)
+        resp_data = {
+            "name": req_data['login'],
+            "avatar_url": req_data['avatar_url'],
+            "html_link": req_data['html_url']
+        }
+        user_obj = Visitor.objects.filter(name=req_data['login'])
+        if not user_obj:
+            user = Visitor(name=req_data['login'], avatar=req_data['avatar_url'], link=req_data['html_url'])
+            user.save()
+        print('res_str', )
+    except Exception as e:
+        print(e, '获取前端传回的数据失败')
+
+    data = {
+        "code": "200",
+        "msg": "成功",
+        "data": resp_data
+    }
+    return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json", charset='utf-8',
+                        status='200', reason='success')

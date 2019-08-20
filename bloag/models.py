@@ -32,7 +32,7 @@ class Artical(models.Model):
 #文章评论
 class ArticalMessage(models.Model):
     message = models.CharField(max_length=500)
-    created_time = models.DateTimeField(auto_now_add=True, null=True)
+    created_time = models.DateTimeField(auto_now_add=True)
     visitor = models.ForeignKey(Visitor, on_delete=models.CASCADE)
     artical = models.ForeignKey(Artical, on_delete=models.CASCADE)
     #父评论
