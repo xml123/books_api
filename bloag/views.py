@@ -148,7 +148,7 @@ def getArticalTypeList(request):
                 'title': item.title,
                 'content': item.content,
                 'view': item.view,
-                'type':type,
+                'type': type,
                 'time': local_time.strftime('%Y-%m-%d')
             })
         data = {
@@ -194,7 +194,8 @@ def getAllArtical(request):
             'content': item.content,
             'view': item.view,
             'time': local_time.strftime('%Y-%m-%d'),
-            'type': classify_type[0].type
+            'type': classify_type[0].type,
+            'classType': classify_type[0].title,
         })
     data = {
         "code": '200',
@@ -290,13 +291,30 @@ def getArticalMessage(request):
         id = data_string['id']
     except Exception as e:
         print(e, '获取前端传回的数据失败')
-    message_list = ArticalMessage.objects.filter(artical_id=id, parent_comment_id__isnull=True)
+    message_list = ArticalMessage.objects.filter(artical_id=id, parent_comment_id__isnull=True).order_by("-created_time")
     list = []
     for item in message_list:
         local_time = item.created_time
         visitor_obj = Visitor.objects.get(id=item.visitor_id)
+        message_item_id = item.id
+        child_message_list = ArticalMessage.objects.filter(artical_id=id, parent_comment_id=message_item_id).order_by("-created_time")
+        child_list = []
+        for item2 in child_message_list:
+            local_time2 = item2.created_time
+            visitor_obj2 = Visitor.objects.get(id=item2.visitor_id)
+            child_list.append({
+                'id': item2.id,
+                'message': item2.message,
+                'time': local_time2.strftime('%Y-%m-%d'),
+                'visitor': {
+                    'name': visitor_obj2.name,
+                    'id': visitor_obj2.id,
+                    'avatar': visitor_obj2.avatar,
+                    'link': visitor_obj2.link
+                }
+            })
         list.append({
-            'id': item.id,
+            'id': message_item_id,
             'message': item.message,
             'time': local_time.strftime('%Y-%m-%d'),
             'visitor': {
@@ -304,7 +322,8 @@ def getArticalMessage(request):
                 'id': visitor_obj.id,
                 'avatar': visitor_obj.avatar,
                 'link': visitor_obj.link
-            }
+            },
+            'child_message_list': child_list
         })
     data = {
         "code": "200",
@@ -341,9 +360,15 @@ def addArticalMessage(request):
         user_name = data_string['name']
         localTime = time.strftime('%Y-%m-%d', time.localtime(time.time()))
         user_obj = Visitor.objects.get(name=user_name)
+        replay_id = data_string['replay_id']
     except Exception as e:
         print(e, '获取前端传回的数据失败')
-    message_obj = ArticalMessage(message=message, artical_id=artical_id, visitor_id=user_obj.id, created_time=localTime)
+    if replay_id == '':
+        message_obj = ArticalMessage(message=message, artical_id=artical_id, visitor_id=user_obj.id,
+                                     created_time=localTime)
+    else:
+        message_obj = ArticalMessage(message=message, artical_id=artical_id, visitor_id=user_obj.id,
+                                     created_time=localTime, parent_comment_id=replay_id)
     message_obj.save()
     data = {
         "code": "200",
