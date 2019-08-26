@@ -16,5 +16,7 @@ urlpatterns = [
     path('api/get_artical_message', views.getArticalMessage, name='getArticalMessage'),
     path('api/add_artical_view', views.addArticalView, name='addArticalView'),
     path('api/add_artical_message', views.addArticalMessage, name='addArticalMessage'),
-    path('api/get_code', views.getCode, name='getCode')
+    path('api/get_code', views.getCode, name='getCode'),
+    path('api/get_live_message', views.getLiveMessage, name='getLiveMessage'),
+    path('api/add_live_message', views.addLiveMessage, name='addLiveMessage')
 ]

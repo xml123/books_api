@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 import json
 from django.http import HttpResponse
-from .models import Classify, Visitor, Artical, ArticalMessage,LiveMessage,Friends
+from .models import Classify, Visitor, Artical, ArticalMessage, LiveMessage, Friends
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import time
 import requests
@@ -70,14 +70,16 @@ def pushArtical(request):
             classify_obj = Classify.objects.filter(title=type)
             status = data_string['status']
             fun = data_string['fun']
+            content_text = data_string['contentText']
             localTime = time.strftime('%Y-%m-%d', time.localtime(time.time()))
             if fun == 'add':
-                artical = Artical(title=title, content=content, view=0, status=status, classify_id=classify_obj[0].id,
+                artical = Artical(title=title, content=content, content_text=content_text, view=0, status=status, classify_id=classify_obj[0].id,
                               time=localTime)
                 artical.save()
             else:
                 id = data_string['id']
                 artical_obj = Artical.objects.get(id=id)
+                artical_obj.content_text = content_text
                 artical_obj.title = title
                 artical_obj.content = content
                 artical_obj.status = status
@@ -196,6 +198,7 @@ def getAllArtical(request):
             'time': local_time.strftime('%Y-%m-%d'),
             'type': classify_type[0].type,
             'classType': classify_type[0].title,
+            'contentText': item.content_text
         })
     data = {
         "code": '200',
@@ -414,6 +417,77 @@ def getCode(request):
         "code": "200",
         "msg": "成功",
         "data": resp_data
+    }
+    return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json", charset='utf-8',
+                        status='200', reason='success')
+
+#获取留言
+#GET
+def getLiveMessage(request):
+    message_list = LiveMessage.objects.filter(parent_comment_id__isnull=True).order_by("-created_time")
+    list = []
+    for item in message_list:
+        local_time = item.created_time
+        visitor_obj = Visitor.objects.get(id=item.visitor_id)
+        message_item_id = item.id
+        child_message_list = LiveMessage.objects.filter(parent_comment_id=message_item_id).order_by("-created_time")
+        child_list = []
+        for item2 in child_message_list:
+            local_time2 = item2.created_time
+            visitor_obj2 = Visitor.objects.get(id=item2.visitor_id)
+            child_list.append({
+                'id': item2.id,
+                'message': item2.message,
+                'time': local_time2.strftime('%Y-%m-%d'),
+                'visitor': {
+                    'name': visitor_obj2.name,
+                    'id': visitor_obj2.id,
+                    'avatar': visitor_obj2.avatar,
+                    'link': visitor_obj2.link
+                }
+            })
+        list.append({
+            'id': message_item_id,
+            'message': item.message,
+            'time': local_time.strftime('%Y-%m-%d'),
+            'visitor': {
+                'name': visitor_obj.name,
+                'id': visitor_obj.id,
+                'avatar': visitor_obj.avatar,
+                'link': visitor_obj.link
+            },
+            'child_message_list': child_list
+        })
+    data = {
+        "code": "200",
+        "msg": "成功",
+        "data": list
+    }
+    return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json", charset='utf-8',
+                        status='200', reason='success')
+
+#添加留言
+#POST
+def addLiveMessage(request):
+    try:
+        data_string = json.loads(request.body)
+        message = data_string['comment']
+        user_name = data_string['name']
+        localTime = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+        user_obj = Visitor.objects.get(name=user_name)
+        replay_id = data_string['replay_id']
+    except Exception as e:
+        print(e, '获取前端传回的数据失败')
+    if replay_id == '':
+        message_obj = LiveMessage(message=message, visitor_id=user_obj.id,
+                                     created_time=localTime)
+    else:
+        message_obj = LiveMessage(message=message, visitor_id=user_obj.id,
+                                     created_time=localTime, parent_comment_id=replay_id)
+    message_obj.save()
+    data = {
+        "code": "200",
+        "msg": "成功"
     }
     return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json", charset='utf-8',
                         status='200', reason='success')

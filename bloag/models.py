@@ -21,6 +21,7 @@ class Visitor(models.Model):
 class Artical(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
+    content_text = models.TextField(blank=True)
     view = models.IntegerField(default=0)
     time = models.DateTimeField(auto_now_add=True)
     classify = models.ForeignKey(Classify, on_delete=models.CASCADE)
@@ -44,7 +45,9 @@ class ArticalMessage(models.Model):
 #留言
 class LiveMessage(models.Model):
     message = models.CharField(max_length=500)
+    created_time = models.DateTimeField(auto_now_add=True)
     visitor = models.ForeignKey(Visitor, on_delete=models.CASCADE)
+    parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.message
