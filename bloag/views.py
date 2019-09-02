@@ -493,7 +493,7 @@ def addLiveMessage(request):
                         status='200', reason='success')
 
 def getOpenid(request):
-    url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx94864d8a37bde769&redirect_uri=http%3A%2F%2Fapi.' \
+    url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx94864d8a37bde769&redirect_uri=https%3A%2F%2Fapi.' \
           'brightness.xin%2Fapi%2Fget_wechat_code&response_type=code&scope=snsapi_userinfo&connect_redirect=1#wechat' \
           '_redirect'
     img = qrcode.make(url)
