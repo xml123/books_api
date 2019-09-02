@@ -5,7 +5,7 @@ from .models import Classify, Visitor, Artical, ArticalMessage, LiveMessage, Fri
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import time
 import requests
-import qrcode
+#import qrcode
 from datetime import datetime
 
 # Create your views here.
@@ -492,19 +492,19 @@ def addLiveMessage(request):
     return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json", charset='utf-8',
                         status='200', reason='success')
 
-def getOpenid(request):
-    url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx94864d8a37bde769&redirect_uri=https%3A%2F%2Fapi.' \
-          'brightness.xin%2Fapi%2Fget_wechat_code&response_type=code&scope=snsapi_userinfo&connect_redirect=1#wechat' \
-          '_redirect'
-    img = qrcode.make(url)
-    with open('test.png', 'wb') as f:
-        img.save(f)
-    image_data = open('test.png', "rb").read()
-    data = {
-        "code": "200",
-        "msg": "成功"
-    }
-    return HttpResponse(image_data, content_type="image/png")
+#def getOpenid(request):
+#    url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx94864d8a37bde769&redirect_uri=https%3A%2F%2Fapi.' \
+#          'brightness.xin%2Fapi%2Fget_wechat_code&response_type=code&scope=snsapi_userinfo&connect_redirect=1#wechat' \
+#          '_redirect'
+#    img = qrcode.make(url)
+#    with open('test.png', 'wb') as f:
+#        img.save(f)
+#    image_data = open('test.png', "rb").read()
+#    data = {
+#        "code": "200",
+#        "msg": "成功"
+#    }
+#    return HttpResponse(image_data, content_type="image/png")
 
 #解析微信返回的数据
 def process_response_login(rsp):

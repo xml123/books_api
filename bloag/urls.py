@@ -19,6 +19,6 @@ urlpatterns = [
     path('api/get_code', views.getCode, name='getCode'),
     path('api/get_live_message', views.getLiveMessage, name='getLiveMessage'),
     path('api/add_live_message', views.addLiveMessage, name='addLiveMessage'),
-    path('api/get_openid', views.getOpenid, name='getOpenid'),
+   # path('api/get_openid', views.getOpenid, name='getOpenid'),
     path('api/get_wechat_code', views.getWechatCode, name='getWechatCode')
 ]
