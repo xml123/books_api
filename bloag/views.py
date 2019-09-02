@@ -5,6 +5,7 @@ from .models import Classify, Visitor, Artical, ArticalMessage, LiveMessage, Fri
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import time
 import requests
+import qrcode
 from datetime import datetime
 
 # Create your views here.
@@ -479,15 +480,83 @@ def addLiveMessage(request):
     except Exception as e:
         print(e, '获取前端传回的数据失败')
     if replay_id == '':
-        message_obj = LiveMessage(message=message, visitor_id=user_obj.id,
-                                     created_time=localTime)
+        message_obj = LiveMessage(message=message, visitor_id=user_obj.id, created_time=localTime)
     else:
-        message_obj = LiveMessage(message=message, visitor_id=user_obj.id,
-                                     created_time=localTime, parent_comment_id=replay_id)
+        message_obj = LiveMessage(message=message, visitor_id=user_obj.id, created_time=localTime,
+                                  parent_comment_id=replay_id)
     message_obj.save()
     data = {
         "code": "200",
         "msg": "成功"
     }
+    return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json", charset='utf-8',
+                        status='200', reason='success')
+
+def getOpenid(request):
+    url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx94864d8a37bde769&redirect_uri=http%3A%2F%2Fapi.' \
+          'brightness.xin%2Fapi%2Fget_wechat_code&response_type=code&scope=snsapi_userinfo&connect_redirect=1#wechat' \
+          '_redirect'
+    img = qrcode.make(url)
+    with open('test.png', 'wb') as f:
+        img.save(f)
+    image_data = open('test.png', "rb").read()
+    data = {
+        "code": "200",
+        "msg": "成功"
+    }
+    return HttpResponse(image_data, content_type="image/png")
+
+#解析微信返回的数据
+def process_response_login(rsp):
+    try:
+        content = rsp.json()
+    except Exception as e:
+        print('出错了')
+        return None, {'code': 9999, 'msg': e}
+    if 'errcode' in content and content['errcode'] != 0:
+        return None, {'code': content['errcode'], 'msg': content['errmsg']}
+    return content, None
+
+#获取openid
+def getWxAppid(code):
+    s = requests.Session()
+    url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx94864d8a37bde769&secret=d6b1fa96c1c0b2f931aa5edf' \
+          'dec4d793&code=%s&grant_type=authorization_code' % code
+    token, err = process_response_login(requests.get(url))
+    if not err:
+        _access_token = token['access_token']
+        _openid = token['openid']
+        res_data = {
+            '_access_token': _access_token,
+            '_openid': _openid
+        }
+    return res_data
+
+def getWechatCode(request):
+    try:
+        code = request.GET.get('code')
+        res_data = getWxAppid(code)
+        openid = res_data['_openid']
+        access_token = res_data['_access_token']
+    except Exception as e:
+        print(e, '获取前端数据失败')
+
+    try:
+        url = 'https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s' % (access_token, openid)
+        print('url', url)
+        token, err = process_response_login(requests.get(url))
+        if not err:
+            print('subscribe', token['city'])
+            print('token', token)
+        else:
+            print('获取失败', err)
+    except Exception as e:
+        print(e, '获取用户信息失败')
+
+    data = {
+        "code": "200",
+        "msg": "成功"
+    }
+
     return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json", charset='utf-8',
                         status='200', reason='success')
