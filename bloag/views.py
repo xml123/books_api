@@ -558,5 +558,5 @@ def getWechatCode(request):
         "msg": "成功"
     }
 
-    return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json", charset='utf-8',
+    return HttpResponse(json.dumps(token, ensure_ascii=False), content_type="application/json", charset='utf-8',
                         status='200', reason='success')
