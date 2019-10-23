@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from .models import Classify, Visitor, Artical, ArticalMessage, LiveMessage, Friends
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import time
@@ -492,19 +492,22 @@ def addLiveMessage(request):
     return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json", charset='utf-8',
                         status='200', reason='success')
 
-#def getOpenid(request):
-#    url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx94864d8a37bde769&redirect_uri=https%3A%2F%2Fapi.' \
-#          'brightness.xin%2Fapi%2Fget_wechat_code&response_type=code&scope=snsapi_userinfo&connect_redirect=1#wechat' \
-#          '_redirect'
-#    img = qrcode.make(url)
-#    with open('test.png', 'wb') as f:
-#        img.save(f)
-#    image_data = open('test.png', "rb").read()
-#    data = {
-#        "code": "200",
-#        "msg": "成功"
-#    }
-#    return HttpResponse(image_data, content_type="image/png")
+def getOpenid(request):
+    url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx94864d8a37bde769&secret=d6b1fa9' \
+          '6c1c0b2f931aa5edfdec4d793'
+    token, err = process_response_login(requests.get(url))
+    if not err:
+        _access_token = token['access_token']
+        post_data = '{"expire_seconds": 50000,"action_name": "QR_STR_SCENE","action_info": {"scene": {"scene_str":' \
+                    ' "test"}}}'
+        response = requests.post('https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s' % _access_token, data=post_data)
+        token, err = process_response_login(response)
+        ticket = token['ticket']
+        print('ticket', ticket)
+        # res = requests.get('https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket= %s' % ticket)
+        # print('res', res)
+    #return HttpResponse(ticket, content_type="image/png")
+    return HttpResponseRedirect('https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%s' % ticket)
 
 #解析微信返回的数据
 def process_response_login(rsp):
@@ -559,4 +562,16 @@ def getWechatCode(request):
     }
 
     return HttpResponse(json.dumps(token, ensure_ascii=False), content_type="application/json", charset='utf-8',
+                        status='200', reason='success')
+
+def getWechatMessage(request):
+    data_string = json.loads(request.body)
+    echostr = data_string['echostr']
+    print('request_mess', request)
+    data = {
+        "code": "200",
+        "msg": "成功"
+    }
+
+    return HttpResponse(json.dumps(echostr, ensure_ascii=False), content_type="application/json", charset='utf-8',
                         status='200', reason='success')
