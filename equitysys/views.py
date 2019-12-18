@@ -30,9 +30,11 @@ def login(request):
             }
         else:
             data = {
-                "code": '200',
-                "message": '用户名或密码错误',
-                "status": "fail"
+                "code": 200,
+                "data": {
+                    "message": '用户名或密码错误',
+                    "status": "fail"
+                }
             }
     return HttpResponse(json.dumps(data, ensure_ascii=False), content_type="application/json", charset='utf-8',
                             status='200', reason='success')
