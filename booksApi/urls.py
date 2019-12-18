@@ -22,4 +22,5 @@ urlpatterns = [
     path('', include('books.urls')),
     path('', include('users.urls')),
     path('', include('bloag.urls')),
+    path('', include('equitysys.urls')),
 ]

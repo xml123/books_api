@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'books',
     'users',
     'bloag',
+    'equitysys'
 ]
 
 MIDDLEWARE = [
