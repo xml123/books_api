@@ -16,7 +16,7 @@ djangorestframework==3.9.0
 idna==2.8
 itypes==1.1.0
 Jinja2==2.10
-lxml==4.2.5
+lxml==4.9.1
 Markdown==3.0.1
 MarkupSafe==1.1.0
 multidict==4.5.2
